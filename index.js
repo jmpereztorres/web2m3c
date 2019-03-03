@@ -1,7 +1,8 @@
 const cheerio = require('cheerio')
 const rp = require('request-promise');
 
-const acestreamHostStreamUrl = 'http://192.168.0.20:6878/ace/manifest.m3u8?id=';
+const urlParams = '/ace/manifest.m3u8?id=';
+acestreamHostStreamUrl = undefined;
 const html = 'https://acelisting.in/';
 
 exports.fetchMatches = (req, res) => {
@@ -12,6 +13,10 @@ exports.fetchMatches = (req, res) => {
     uri: html,
     insecure: true
   };
+
+  if (req != undefined && req.body != undefined && req.body.localIp != undefined) {
+    acestreamHostStreamUrl = req.body.localIp + urlParams;
+  }
 
   rp(options)
     .then(function (html) {
@@ -33,8 +38,8 @@ exports.fetchMatches = (req, res) => {
 
       }
 
-      if (req != undefined && req.body != undefined) {
-        response = response.filter(node => filterResults(node, req.body));
+      if (req != undefined && req.body != undefined && req.body.filter != undefined) {
+        response = response.filter(node => filterResults(node, req.body.filter));
       }
 
       res.status(200).send(response);
@@ -46,27 +51,25 @@ exports.fetchMatches = (req, res) => {
 };
 
 function filterResults(json, body) {
-  if (body != undefined) {
 
-    if (body.time != undefined && json.time != body.time) {
-      return false;
-    }
+  if (body.time != undefined && json.time != body.time) {
+    return false;
+  }
 
-    if (body.date != undefined && json.date != body.date) {
-      return false;
-    }
+  if (body.date != undefined && json.date != body.date) {
+    return false;
+  }
 
-    if (body.sport != undefined && json.sport != undefined && !json.sport.toUpperCase().includes(body.sport.toUpperCase())) {
-      return false;
-    }
+  if (body.sport != undefined && json.sport != undefined && !json.sport.toUpperCase().includes(body.sport.toUpperCase())) {
+    return false;
+  }
 
-    if (body.match != undefined && json.match != undefined && !json.match.toUpperCase().includes(body.match.toUpperCase())) {
-      return false;
-    }
+  if (body.match != undefined && json.match != undefined && !json.match.toUpperCase().includes(body.match.toUpperCase())) {
+    return false;
+  }
 
-    if (body.league != undefined && json.league != undefined && !json.league.toUpperCase().includes(body.league.toUpperCase())) {
-      return false;
-    }
+  if (body.league != undefined && json.league != undefined && !json.league.toUpperCase().includes(body.league.toUpperCase())) {
+    return false;
   }
 
   return true;
@@ -91,8 +94,13 @@ function parseHtmlRowToJson($, tr) {
   for (i = 0; i < linksHtml.length; i++) {
     link = {
       name: linksHtml.get(i).children[0].data.trim(),
-      url: linksHtml.get(i).attribs.href.replace('acestream://', acestreamHostStreamUrl)
+      url: linksHtml.get(i).attribs.href.trim()
     };
+
+    if (acestreamHostStreamUrl != undefined) {
+      link.url = link.url.replace('acestream://', acestreamHostStreamUrl);
+    }
+
     res.links.push(link);
   }
 

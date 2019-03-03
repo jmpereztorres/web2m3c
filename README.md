@@ -5,10 +5,26 @@ It parses the https://acelisting.in/ web in order to get show links for streamin
 To filter shows use the following body example in a POST request:
 ```
 {
-	time: '22:30',
-	date: '20 Mar',
-	sport: 'soccer',
-	match: 'liverpool',
-	league: 'premier league'
+    filter: {
+	    time: '22:30',
+	    date: '20 Mar',
+	    sport: 'soccer',
+	    match: 'liverpool',
+	    league: 'premier league'
+    }
+}
+```
+
+To customize the acestream url you can add your localIpDevice using the same body object as below:
+```
+{
+    filter: {
+	    time: '22:30',
+	    date: '20 Mar',
+	    sport: 'soccer',
+	    match: 'liverpool',
+	    league: 'premier league'
+    },
+    localIp: 'http://192.168.1.1:6879
 }
 ```
