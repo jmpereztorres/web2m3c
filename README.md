@@ -30,7 +30,7 @@ To customize the acestream url you can add your localIpDevice using the same bod
 ```
 
 A service response example:
-````
+```
 [
    {
       "links":[
